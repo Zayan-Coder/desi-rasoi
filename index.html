@@ -16,187 +16,157 @@
             background: linear-gradient(to bottom, #a8dadc, #457b9d);
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: flex-start; /* Align to top */
             height: 100vh;
             overflow: hidden;
-            position: relative;
-            padding-top: 20px;
         }
 
         #wrapper {
             text-align: center;
             width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 20px;
+            max-width: 500px;
+            margin: 20px auto; /* Centering */
+            padding: 20px;
         }
 
-        /* Typewriter text animation */
-        .typewriter h1 {
-            color: #FFD700; /* Golden color */
-            font-family: monospace;
-            white-space: nowrap;
-            overflow: hidden;
-            border-right: 2px solid;
-            font-weight: bold;
-            animation: typing 5s steps(40, end), blink-caret 0.75s step-end infinite;
-            font-size: 32px;
+        h1 {
+            color: gold; /* Non-glowing gold color */
+            font-size: 28px;
             margin-bottom: 20px;
-            display: inline-block;
         }
 
-        /* Typing effect */
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        /* Blinking caret */
-        @keyframes blink-caret {
-            from, to { border-color: transparent; }
-            50% { border-color: black; }
-        }
-
-        /* Button styling */
         button {
-            padding: 10px;
+            padding: 15px;
+            margin: 10px 0;
             background-color: #007bff;
             border: none;
-            border-radius: 5px;
+            border-radius: 30px;
             color: white;
-            font-size: 16px;
+            font-size: 18px;
             cursor: pointer;
-            margin: 5px;
+            width: 100%;
+            max-width: 400px;
+            transition: background-color 0.3s;
         }
 
         button:hover {
             background-color: #0056b3;
         }
 
-        /* Input Box Styling */
-        input[type="text"] {
+        /* Recipe Card Styles */
+        .recipe-card {
+            background: linear-gradient(to bottom right, #ffffff, #e0e0e0);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .recipe-card img {
+            max-width: 100%;
+            border-radius: 10px;
+            height: auto;
+        }
+
+        /* Input Box */
+        input[type="text"], input[type="text"]:focus {
             width: 100%;
             padding: 10px;
+            font-size: 16px;
             margin: 10px 0;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            transition: border-color 0.3s;
         }
 
-        /* Recipe Cards */
-        .recipe-card {
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 15px;
-            margin: 10px 0;
-            text-align: left;
+        input[type="text"]:focus {
+            border-color: #007bff;
+            outline: none;
         }
 
-        /* Responsive Design */
+        /* Audio Element */
+        audio {
+            display: none; /* Hide audio player */
+        }
+
+        /* Responsive design */
         @media (max-width: 768px) {
-            .typewriter h1 {
+            h1 {
                 font-size: 24px;
             }
             button {
-                font-size: 14px;
+                font-size: 16px;
             }
-            input[type="text"] {
-                font-size: 14px;
-            }
-        }
-
-        /* Loading GIF */
-        #loading-gif {
-            display: none;
-            width: 100px;
-            margin: 20px auto;
-        }
-
-        /* Image styling for recipes */
-        .recipe-image {
-            width: 100%; /* Adjust the size as needed */
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        /* Custom styles for My Recipes and Custom Recipe */
-        #custom-recipe {
-            display: inline-block;
-            float: left;
-        }
-
-        #my-recipes {
-            display: inline-block;
-            float: right;
-        }
-
-        /* Clearfix for floating elements */
-        .clearfix::after {
-            content: "";
-            clear: both;
-            display: table;
         }
     </style>
 </head>
 <body>
 
     <div id="wrapper">
-        <div class="typewriter">
-            <h1>Indian Style Recipe Generator</h1>
-        </div>
-        
-        <div class="clearfix">
-            <div id="custom-recipe">
-                <input type="text" id="new-recipe-name" placeholder="Recipe Name">
-                <input type="text" id="new-recipe-ingredients" placeholder="Ingredients (comma separated)">
-                <input type="text" id="new-recipe-description" placeholder="Description">
-                <input type="text" id="new-recipe-state" placeholder="State">
-                <input type="text" id="new-recipe-style" placeholder="Village/City Style">
-                <input type="text" id="new-recipe-image" placeholder="Image URL">
-                <button onclick="addCustomRecipe()">Add Custom Recipe</button>
-            </div>
-            <div id="my-recipes">
-                <button onclick="showMyRecipes()">My Recipes</button>
-            </div>
-        </div>
+        <h1>Indian Style Recipe Generator</h1>
+        <button id="custom-recipe-btn" onclick="showCustomRecipeForm()">Custom Recipe</button>
+        <button id="my-recipes-btn" onclick="showMyRecipes()">My Recipes</button>
+
+        <input type="text" id="ingredient" placeholder="Enter ingredients (comma separated)">
+        <button onclick="suggestRecipe()">Get Recipes</button>
 
         <h2>Suggested Recipes:</h2>
         <div id="recipes"></div>
 
-        <img id="loading-gif" src="Cooking.gif" alt="Loading">
-        <audio id="ready-sound" src="Cooked.wav"></audio>
-        <audio id="bg-music" src="Bg.mp3" loop autoplay></audio>
+        <!-- Custom Recipe Form -->
+        <div id="custom-recipe-form" style="display:none;">
+            <h3>Add Custom Recipe</h3>
+            <input type="text" id="new-recipe-name" placeholder="Recipe Name">
+            <input type="text" id="new-recipe-ingredients" placeholder="Ingredients (comma separated)">
+            <input type="text" id="new-recipe-description" placeholder="Description">
+            <input type="text" id="new-recipe-state" placeholder="State">
+            <input type="text" id="new-recipe-style" placeholder="Village/City Style">
+            <input type="text" id="new-recipe-image" placeholder="Image Path (e.g. biryani.jpg)">
+            <button onclick="addCustomRecipe()">Add Recipe</button>
+            <button onclick="hideCustomRecipeForm()">Cancel</button>
+        </div>
+
+        <!-- Audio for background music -->
+        <audio id="bg-music" loop>
+            <source src="Bg.mp3" type="audio/mp3">
+        </audio>
+        <audio id="ready-sound">
+            <source src="Cooked.wav" type="audio/wav">
+        </audio>
     </div>
 
     <script>
-        // Initialize recipes from local storage or default values
-        let recipes = JSON.parse(localStorage.getItem('recipes')) || [
-            {
-                name: "Hyderabadi Biryani",
-                ingredients: ["rice", "chicken", "yogurt", "spices"],
-                description: "A world-famous Hyderabadi biryani made with basmati rice, chicken marinated in yogurt and traditional spices.",
-                state: "Telangana",
-                style: "City Style",
-                image: "Hydrabadi biryani.jpg",
-                video: "https://www.youtube.com/watch?v=QdpB1h0MS6M"
-            }
-        ];
+        const recipes = JSON.parse(localStorage.getItem('recipes')) || [];
+
+        // Show custom recipe form
+        function showCustomRecipeForm() {
+            document.getElementById('custom-recipe-form').style.display = 'block';
+        }
+
+        // Hide custom recipe form
+        function hideCustomRecipeForm() {
+            document.getElementById('custom-recipe-form').style.display = 'none';
+        }
 
         // Function to add a custom recipe
         function addCustomRecipe() {
             const name = document.getElementById('new-recipe-name').value;
-            const ingredients = document.getElementById('new-recipe-ingredients').value.split(',').map(item => item.trim());
+            const ingredients = document.getElementById('new-recipe-ingredients').value.split(',').map(i => i.trim());
             const description = document.getElementById('new-recipe-description').value;
             const state = document.getElementById('new-recipe-state').value;
             const style = document.getElementById('new-recipe-style').value;
             const image = document.getElementById('new-recipe-image').value;
 
-            const newRecipe = { name, ingredients, description, state, style, image, video: "#" }; // Video URL can be added later
+            const newRecipe = { name, ingredients, description, state, style, image };
             recipes.push(newRecipe);
-            localStorage.setItem('recipes', JSON.stringify(recipes)); // Update local storage
-            displayRecipes(recipes); // Refresh the recipe list
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            displayRecipes(recipes);
+            hideCustomRecipeForm(); // Hide the form after adding
+            clearForm();
+        }
 
-            // Clear input fields
+        // Function to clear the input form
+        function clearForm() {
             document.getElementById('new-recipe-name').value = '';
             document.getElementById('new-recipe-ingredients').value = '';
             document.getElementById('new-recipe-description').value = '';
@@ -205,47 +175,48 @@
             document.getElementById('new-recipe-image').value = '';
         }
 
-        // Function to display recipes
-        function displayRecipes(recipesToDisplay) {
-            const recipesContainer = document.getElementById('recipes');
-            recipesContainer.innerHTML = ''; // Clear previous recipes
-            const loadingGif = document.getElementById('loading-gif');
+        // Function to suggest recipes based on ingredients
+        function suggestRecipe() {
+            const ingredientInput = document.getElementById("ingredient").value;
+            const ingredientList = ingredientInput.split(',').map(item => item.trim().toLowerCase());
+            const suggestedRecipes = recipes.filter(recipe =>
+                ingredientList.some(ingredient => recipe.ingredients.map(i => i.toLowerCase()).includes(ingredient))
+            );
 
-            // Show loading GIF for 5 seconds
-            loadingGif.style.display = 'block';
-            setTimeout(() => {
-                loadingGif.style.display = 'none';
-                
-                if (recipesToDisplay.length === 0) {
-                    recipesContainer.innerHTML = '<p>No recipes found.</p>';
-                    return;
-                }
-
-                recipesToDisplay.forEach((recipe, index) => {
-                    const recipeCard = document.createElement('div');
-                    recipeCard.className = 'recipe-card';
-                    recipeCard.innerHTML = `
-                        <img class="recipe-image" src="${recipe.image}" alt="${recipe.name}">
-                        <h3>${recipe.name}</h3>
-                        <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
-                        <p><strong>Description:</strong> ${recipe.description}</p>
-                        <p><strong>State:</strong> ${recipe.state} | <strong>Style:</strong> ${recipe.style}</p>
-                        <div class="buttons">
-                            <button onclick="window.open('${recipe.video}', '_blank')">Watch Video</button>
-                            <button onclick="shareRecipe(recipe)">Share</button>
-                            <button onclick="editRecipe(${index})">Edit</button>
-                            <button onclick="deleteRecipe(${index})">Delete</button>
-                        </div>
-                    `;
-                    recipesContainer.appendChild(recipeCard);
-                });
-
-                // Play the ready sound when recipes are displayed
-                document.getElementById('ready-sound').play();
-            }, 5000); // Show GIF for 5 seconds
+            displayRecipes(suggestedRecipes);
+            document.getElementById('bg-music').play(); // Play background music
         }
 
-        // Function to show custom recipes
+        // Function to display recipes
+        function displayRecipes(suggestedRecipes) {
+            const recipesDiv = document.getElementById("recipes");
+            recipesDiv.innerHTML = ""; // Clear previous results
+
+            if (suggestedRecipes.length === 0) {
+                recipesDiv.innerHTML = "<p>No recipes found for the given ingredients.</p>";
+                return;
+            }
+
+            suggestedRecipes.forEach((recipe, index) => {
+                const recipeCard = document.createElement("div");
+                recipeCard.className = "recipe-card";
+                recipeCard.innerHTML = `
+                    <strong>${recipe.name}</strong><br>
+                    <em>${recipe.description}</em><br>
+                    <strong>State:</strong> ${recipe.state} | <strong>Style:</strong> ${recipe.style}<br>
+                    <img src="${recipe.image}" alt="${recipe.name}">
+                    <button onclick="shareRecipe(recipe)">Share</button>
+                    <button onclick="editRecipe(${index})">Edit</button>
+                    <button onclick="deleteRecipe(${index})">Delete</button>
+                `;
+                recipesDiv.appendChild(recipeCard);
+            });
+
+            // Play the sound when recipes are displayed
+            document.getElementById('ready-sound').play();
+        }
+
+        // Function to show My Recipes
         function showMyRecipes() {
             displayRecipes(recipes);
         }
@@ -266,29 +237,40 @@
             document.getElementById('new-recipe-state').value = recipe.state;
             document.getElementById('new-recipe-style').value = recipe.style;
             document.getElementById('new-recipe-image').value = recipe.image;
-            deleteRecipe(index); // Remove the recipe from the list for editing
+
+            // Delete the recipe from the list for editing
+            deleteRecipe(index);
+            hideCustomRecipeForm(); // Hide form so user can update the recipe
         }
 
         // Function to share a recipe
         function shareRecipe(recipe) {
-            const shareText = `Check out this recipe for ${recipe.name}:\nIngredients: ${recipe.ingredients.join(', ')}\nDescription: ${recipe.description}\nImage: ${recipe.image}`;
+            const recipeDetails = `
+                Recipe Name: ${recipe.name}
+                Ingredients: ${recipe.ingredients.join(', ')}
+                Description: ${recipe.description}
+                State: ${recipe.state}
+                Style: ${recipe.style}
+                Image: ${recipe.image}
+            `;
             if (navigator.share) {
                 navigator.share({
                     title: recipe.name,
-                    text: shareText,
+                    text: recipeDetails,
                     url: window.location.href,
-                }).then(() => {
-                    console.log('Recipe shared successfully!');
-                }).catch((error) => {
-                    console.error('Error sharing the recipe:', error);
-                });
+                })
+                .then(() => console.log('Recipe shared successfully!'))
+                .catch(error => console.error('Error sharing recipe:', error));
             } else {
-                alert('Sharing not supported on this browser. Copy the text to share:\n' + shareText);
+                alert('Sharing not supported in this browser. Copy the details manually:\n' + recipeDetails);
             }
         }
 
-        // Initial display of recipes
-        displayRecipes(recipes);
+        // Display the saved recipes when the page loads
+        window.onload = function() {
+            displayRecipes(recipes);
+            document.getElementById('bg-music').play(); // Play background music
+        };
     </script>
 </body>
 </html>
