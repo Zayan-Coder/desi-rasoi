@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Style Recipe Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, #a8dadc, #457b9d);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+        }
+
+        #custom-recipe-btn, #my-recipes-btn {
+            position: absolute;
+            top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+            transition: all 0.5s ease;
+        }
+
+        #custom-recipe-btn:hover, #my-recipes-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 123, 255, 0.8);
+        }
+
+        #custom-recipe-btn {
+            left: 20px;
+        }
+
+        #my-recipes-btn {
+            left: 180px;
+        }
+
+        #loading-gif {
+            width: 150px;
+            height: 150px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .recipe-card {
+            background: linear-gradient(45deg, #e66465, #9198e5);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: left;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .recipe-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .recipe-card h3 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .recipe-card button {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .recipe-card button:hover {
+            background-color: #003f7f;
+        }
+
+        .edit-delete-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            margin: 20px 0;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Arial', sans-serif;
+        }
+
+        input[type="text"]:focus {
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.5s ease;
+        }
+
+        button:hover {
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        h2 {
+            margin: 20px 0;
+            color: white;
+        }
+
+        .typewriter h1 {
+            color: white;
+            font-size: 36px;
+            overflow: hidden;
+            border-right: .15em solid #007bff;
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #007bff; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Custom Recipe and My Recipes Buttons -->
+    <button id="custom-recipe-btn" onclick="addCustomRecipe()">Add Custom Recipe</button>
+    <button id="my-recipes-btn" onclick="showMyRecipes()">My Recipes</button>
+
+    <div id="wrapper">
+        <!-- Loading GIF -->
+        <img id="loading-gif" src="cooking.gif" alt="Loading" style="display:none;">
+
+        <!-- Main Content -->
+        <div id="main-content">
+            <div class="typewriter">
+                <h1>Indian Style Recipe Generator</h1>
+            </div>
+
+            <!-- Search Bar -->
+            <input type="text" id="ingredient" placeholder="Enter ingredients (comma separated)">
+            <button onclick="suggestRecipe()">Get Recipes</button>
+
+            <h2>Suggested Recipes:</h2>
+            <div id="recipes"></div>
+        </div>
+    </div>
+
+    <audio id="ready-sound" src="cooking.wav></audio>
+    <audio id="bg-music" src="bg.mp3" loop autoplay></audio>
+
+    <script>
+        // Recipe data will be persisted in local storage
+        let recipes = JSON.parse(localStorage.getItem('recipes')) || [
+            { name: "Hyderabadi Biryani", ingredients: ["rice", "chicken", "yogurt", "spices"], description: "A world-famous Hyderabadi biryani made with basmati rice, chicken marinated in yogurt and traditional spices.", video: "https://www.youtube.com/watch?v=QdpB1h0MS6M", state: "Telangana", style: "City Style", image: "Hydrabadi biryani.jpg" },
+        ];
+
+        // Function to add a custom recipe
+        function addCustomRecipe() {
+            const name = prompt("Enter recipe name:");
+            const ingredients = prompt("Enter ingredients (comma separated):").split(',').map(item => item.trim());
+            const description = prompt("Enter recipe description:");
+            const video = prompt("Enter recipe video URL:");
+            const state = prompt("Enter recipe's state:");
+            const style = prompt("Enter recipe style (Village or City):");
+            const image = prompt("Enter image path (or URL):");
+
+            const customRecipe = { name, ingredients, description, video, state, style, image, isCustom: true };
+            recipes.push(customRecipe);
+
+            localStorage.setItem('recipes', JSON.stringify(recipes)); // Save to local storage
+            alert("Recipe added successfully!");
+            displayRecipes([customRecipe]);
+        }
+
+        // Function to edit a custom recipe
+        function editRecipe(index) {
+            const recipe = recipes[index];
+            recipe.name = prompt("Edit recipe name:", recipe.name);
+            recipe.ingredients = prompt("Edit ingredients (comma separated):", recipe.ingredients.join(',')).split(',').map(item => item.trim());
+            recipe.description = prompt("Edit description:", recipe.description);
+            recipe.video = prompt("Edit video URL:", recipe.video);
+            recipe.state = prompt("Edit state:", recipe.state);
+            recipe.style = prompt("Edit style (Village or City):", recipe.style);
+            recipe.image = prompt("Edit image path (or URL):", recipe.image);
+
+            recipes[index] = recipe;
+            localStorage.setItem('recipes', JSON.stringify(recipes)); // Update in local storage
+            displayRecipes(recipes); // Refresh recipe card
+        }
+
+        // Function to delete a recipe
+        function deleteRecipe(index) {
+            recipes.splice(index, 1);
+            localStorage.setItem('recipes', JSON.stringify(recipes)); // Update local storage
+            suggestRecipe(); // Refresh recipe list
+        }
+
+        // Function to share a recipe
+        function shareRecipe(recipe) {
+            if (navigator.share) {
+                navigator.share({
+                    title: recipe.name,
+                    text: recipe.description,
+                    url: recipe.video
+                }).then(() => {
+                    console.log('Recipe shared successfully.');
+                }).catch(console.error);
+            } else {
+                alert("Your browser doesn't support sharing.");
+            }
+        }
+
+        // Function to suggest a recipe based on ingredients
+        function suggestRecipe() {
+            const ingredientInput = document.getElementById('ingredient').value;
+            const ingredientList = ingredientInput.split(',').map(item => item.trim());
+            const suggestedRecipes = recipes.filter(recipe =>
+                recipe.ingredients.some(ingredient => ingredientList.includes(ingredient))
+            );
+
+            displayRecipes(suggestedRecipes);
+        }
+
+        // Function to display recipes
+        function displayRecipes(recipesToDisplay) {
+            const recipesContainer = document.getElementById('recipes');
+            recipesContainer.innerHTML = ''; // Clear previous recipes
+            const loadingGif = document.getElementById('loading-gif');
+
+            // Show loading GIF for 5 seconds
+            loadingGif.style.display = 'block';
+            setTimeout(() => {
+                loadingGif.style.display = 'none';
+                
+                if (recipesToDisplay.length === 0) {
+                    recipesContainer.innerHTML = '<p>No recipes found.</p>';
+                    return;
+                }
+
+                recipesToDisplay.forEach((recipe, index) => {
+                    const recipeCard = document.createElement('div');
+                    recipeCard.className = 'recipe-card';
+                    recipeCard.innerHTML = `
+                        <img src="${recipe.image}" alt="${recipe.name}">
+                        <h3>${recipe.name}</h3>
+                        <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+                        <p><strong>Description:</strong> ${recipe.description}</p>
+                        <p><strong>State:</strong> ${recipe.state} | <strong>Style:</strong> ${recipe.style}</p>
+                        <div class="buttons">
+                            <button onclick="window.open('${recipe.video}', '_blank')">Watch Video</button>
+                            <button onclick="shareRecipe(recipe)">Share</button>
+                        </div>
+                        <div class="edit-delete-buttons">
+                            <button onclick="editRecipe(${index})">Edit</button>
+                            <button onclick="deleteRecipe(${index})">Delete</button>
+                        </div>
+                    `;
+                    recipesContainer.appendChild(recipeCard);
+                });
+
+                // Play the ready sound when recipes are displayed
+                document.getElementById('ready-sound').play();
+            }, 5000); // Show GIF for 5 seconds
+        }
+
+        // Function to show custom recipes
+        function showMyRecipes() {
+            displayRecipes(recipes);
+        }
+    </script>
+</body>
+</html>
