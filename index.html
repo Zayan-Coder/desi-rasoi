@@ -16,36 +16,41 @@
             background: linear-gradient(to bottom, #a8dadc, #457b9d);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align to top */
-            height: 100vh;
-            overflow: hidden;
+            align-items: flex-start;
+            height: 100%;
+            overflow-y: scroll; /* Allow scroll */
+            padding-bottom: 50px;
         }
 
         #wrapper {
             text-align: center;
             width: 100%;
-            max-width: 500px;
-            margin: 20px auto; /* Centering */
+            max-width: 600px;
+            margin: 20px auto;
             padding: 20px;
         }
 
         h1 {
-            color: gold; /* Non-glowing gold color */
+            color: gold;
             font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-around;
             margin-bottom: 20px;
         }
 
         button {
             padding: 15px;
-            margin: 10px 0;
             background-color: #007bff;
             border: none;
             border-radius: 30px;
             color: white;
             font-size: 18px;
             cursor: pointer;
-            width: 100%;
-            max-width: 400px;
+            width: 45%; /* Adjust button width */
             transition: background-color 0.3s;
         }
 
@@ -55,7 +60,7 @@
 
         /* Recipe Card Styles */
         .recipe-card {
-            background: linear-gradient(to bottom right, #ffffff, #e0e0e0);
+            background: linear-gradient(to bottom right, #fff, #e0e0e0, #f7f7f7);
             border-radius: 15px;
             padding: 15px;
             margin: 15px 0;
@@ -84,9 +89,19 @@
             outline: none;
         }
 
-        /* Audio Element */
-        audio {
-            display: none; /* Hide audio player */
+        /* Cooking GIF */
+        #cooking-gif {
+            display: none;
+            width: 100px;
+            margin: 20px auto;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: white;
+            font-size: 14px;
         }
 
         /* Responsive design */
@@ -96,29 +111,26 @@
             }
             button {
                 font-size: 16px;
+                width: 100%; /* Full width for smaller screens */
             }
         }
     </style>
-
-
-        <!-- Audio for background music -->
-        <audio id="bg-music" loop>
-            <source src="Bg.mp3" type="audio/mp3">
-        </audio>
-        <audio id="ready-sound">
-            <source src="Cooked.wav" type="audio/wav">
-        </audio>
-    
 </head>
 <body>
 
     <div id="wrapper">
         <h1>Indian Style Recipe Generator</h1>
-        <button id="custom-recipe-btn" onclick="showCustomRecipeForm()">Custom Recipe</button>
-        <button id="my-recipes-btn" onclick="showMyRecipes()">My Recipes</button>
+
+        <div class="button-container">
+            <button id="custom-recipe-btn" onclick="showCustomRecipeForm()">Custom Recipe</button>
+            <button id="my-recipes-btn" onclick="showMyRecipes()">My Recipes</button>
+        </div>
 
         <input type="text" id="ingredient" placeholder="Enter ingredients (comma separated)">
         <button onclick="suggestRecipe()">Get Recipes</button>
+
+        <!-- Cooking GIF -->
+        <img id="cooking-gif" src="cooking.gif" alt="Cooking in progress">
 
         <h2>Suggested Recipes:</h2>
         <div id="recipes"></div>
@@ -136,7 +148,19 @@
             <button onclick="hideCustomRecipeForm()">Cancel</button>
         </div>
 
+        <!-- Footer -->
+        <footer>
+            &copy; 2024 Made by Students of S.U.P.S: Mohammed Mubashir (7C) and Arslan Uddin (7C)
+        </footer>
     </div>
+
+    <!-- Audio for background music and sound effects -->
+    <audio id="bg-music" loop>
+        <source src="Bg.mp3" type="audio/mp3">
+    </audio>
+    <audio id="ready-sound">
+        <source src="Cooked.wav" type="audio/wav">
+    </audio>
 
     <script>
         const recipes = JSON.parse(localStorage.getItem('recipes')) || [];
@@ -164,7 +188,7 @@
             recipes.push(newRecipe);
             localStorage.setItem('recipes', JSON.stringify(recipes));
             displayRecipes(recipes);
-            hideCustomRecipeForm(); // Hide the form after adding
+            hideCustomRecipeForm();
             clearForm();
         }
 
@@ -180,6 +204,7 @@
 
         // Function to suggest recipes based on ingredients
         function suggestRecipe() {
+            document.getElementById("cooking-gif").style.display = 'block'; // Show cooking gif
             const ingredientInput = document.getElementById("ingredient").value;
             const ingredientList = ingredientInput.split(',').map(item => item.trim().toLowerCase());
             const suggestedRecipes = recipes.filter(recipe =>
@@ -188,9 +213,12 @@
 
             displayRecipes(suggestedRecipes);
             document.getElementById('bg-music').play(); // Play background music
+            setTimeout(() => {
+                document.getElementById("cooking-gif").style.display = 'none'; // Hide cooking gif
+            }, 2000); // Hide after 2 seconds
         }
 
-        // Function to display recipes
+      // Function to display recipes (continued)
         function displayRecipes(suggestedRecipes) {
             const recipesDiv = document.getElementById("recipes");
             recipesDiv.innerHTML = ""; // Clear previous results
@@ -243,7 +271,7 @@
 
             // Delete the recipe from the list for editing
             deleteRecipe(index);
-            hideCustomRecipeForm(); // Hide form so user can update the recipe
+            showCustomRecipeForm(); // Show form so user can update the recipe
         }
 
         // Function to share a recipe
