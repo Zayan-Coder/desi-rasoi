@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Style Recipe Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(to bottom, #a8dadc, #457b9d);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #wrapper {
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #FFD700; /* Golden color */
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin: 20px 0;
+        }
+
+        input[type="text"], button {
+            width: 90%;
+            max-width: 400px;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            box-shadow: 0 0 25px rgba(0, 123, 255, 0.8);
+        }
+
+        .recipe-card {
+            background: linear-gradient(to right, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .recipe-card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        #bg-music {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bg-music" src="Bg.mp3" loop></audio>
+    <div id="wrapper">
+        <h1>Indian Style Recipe Generator</h1>
+        <h2>My Recipes</h2>
+        <div id="my-recipes"></div>
+
+        <h2>Add Custom Recipe</h2>
+        <input type="text" id="new-recipe-name" placeholder="Recipe Name">
+        <input type="text" id="new-recipe-ingredients" placeholder="Ingredients (comma separated)">
+        <input type="text" id="new-recipe-description" placeholder="Description">
+        <input type="text" id="new-recipe-state" placeholder="State">
+        <input type="text" id="new-recipe-style" placeholder="Style (Village/City)">
+        <input type="text" id="new-recipe-image" placeholder="Image URL">
+        <button onclick="addCustomRecipe()">Add Recipe</button>
+
+        <h2>Suggested Recipes:</h2>
+        <div id="recipes"></div>
+    </div>
+
+    <script>
+        // Initialize recipes array with Hyderabadi Biryani
+        let recipes = [
+            {
+                name: "Hyderabadi Biryani",
+                ingredients: ["rice", "chicken", "yogurt", "spices", "onions", "mint", "saffron"],
+                description: "A world-famous Hyderabadi biryani made with basmati rice, chicken marinated in yogurt and traditional spices.",
+                state: "Telangana",
+                style: "City Style",
+                image: "biryani.jpg" // Path to the image file
+            }
+        ];
+
+        // Load recipes from localStorage
+        window.onload = function() {
+            const storedRecipes = JSON.parse(localStorage.getItem('recipes'));
+            if (storedRecipes) {
+                recipes = storedRecipes;
+            }
+            displayRecipes(recipes);
+            document.getElementById('bg-music').play(); // Play background music
+        };
+
+        // Function to display recipes
+        function displayRecipes(recipesArray) {
+            const recipesDiv = document.getElementById("recipes");
+            const myRecipesDiv = document.getElementById("my-recipes");
+            recipesDiv.innerHTML = ""; // Clear previous results
+            myRecipesDiv.innerHTML = ""; // Clear previous custom recipes
+
+            recipesArray.forEach((recipe, index) => {
+                const recipeCard = document.createElement("div");
+                recipeCard.className = "recipe-card";
+                recipeCard.innerHTML = `
+                    <strong>${recipe.name}</strong>
+                    <img src="${recipe.image}" alt="${recipe.name}">
+                    <p><em>${recipe.description}</em></p>
+                    <p><strong>Ingredients:</strong> ${recipe.ingredients.join(', ')}</p>
+                    <p><strong>State:</strong> ${recipe.state} | <strong>Style:</strong> ${recipe.style}</p>
+                    <button onclick="shareRecipe(recipe)">Share</button>
+                    <button onclick="editRecipe(${index})">Edit</button>
+                    <button onclick="deleteRecipe(${index})">Delete</button>
+                `;
+                if (index < 1) { // Change this to display the first recipe as a suggested one
+                    recipesDiv.appendChild(recipeCard);
+                } else {
+                    myRecipesDiv.appendChild(recipeCard);
+                }
+            });
+        }
+
+        // Function to add custom recipes
+        function addCustomRecipe() {
+            const name = document.getElementById('new-recipe-name').value;
+            const ingredients = document.getElementById('new-recipe-ingredients').value.split(',').map(item => item.trim());
+            const description = document.getElementById('new-recipe-description').value;
+            const state = document.getElementById('new-recipe-state').value;
+            const style = document.getElementById('new-recipe-style').value;
+            const image = document.getElementById('new-recipe-image').value;
+
+            const newRecipe = {
+                name,
+                ingredients,
+                description,
+                state,
+                style,
+                image,
+            };
+
+            recipes.push(newRecipe);
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            displayRecipes(recipes); // Refresh the displayed recipes
+            clearInputFields();
+        }
+
+        // Function to clear input fields
+        function clearInputFields() {
+            document.getElementById('new-recipe-name').value = '';
+            document.getElementById('new-recipe-ingredients').value = '';
+            document.getElementById('new-recipe-description').value = '';
+            document.getElementById('new-recipe-state').value = '';
+            document.getElementById('new-recipe-style').value = '';
+            document.getElementById('new-recipe-image').value = '';
+        }
+
+        // Function to edit a recipe
+        function editRecipe(index) {
+            const recipe = recipes[index];
+            document.getElementById('new-recipe-name').value = recipe.name;
+            document.getElementById('new-recipe-ingredients').value = recipe.ingredients.join(', ');
+            document.getElementById('new-recipe-description').value = recipe.description;
+            document.getElementById('new-recipe-state').value = recipe.state;
+            document.getElementById('new-recipe-style').value = recipe.style;
+            document.getElementById('new-recipe-image').value = recipe.image;
+
+            // Delete the recipe from the list for editing
+            deleteRecipe(index);
+        }
+
+        // Function to delete a recipe
+        function deleteRecipe(index) {
+            recipes.splice(index, 1);
+            localStorage.setItem('recipes', JSON.stringify(recipes));
+            displayRecipes(recipes); // Refresh the displayed recipes
+        }
+
+        // Function to share a recipe
+        function shareRecipe(recipe) {
+            const recipeDetails = `
+                Recipe Name: ${recipe.name}
+                Ingredients: ${recipe.ingredients.join(', ')}
+                Description: ${recipe.description}
+                State: ${recipe.state}
+                Style: ${recipe.style}
+                Image: ${recipe.image}
+            `;
+            if (navigator.share) {
+                navigator.share({
+                    title: recipe.name,
+                    text: recipeDetails,
+                    url: window.location.href,
+                })
+                .then(() => console.log('Recipe shared successfully!'))
+                .catch(error => console.error('Error sharing recipe:', error));
+            } else {
+                alert('Sharing not supported in this browser. Copy the details manually:\n' + recipeDetails);
+            }
+        }
+    </script>
+</body>
+</html>
